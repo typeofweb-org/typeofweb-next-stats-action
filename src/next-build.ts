@@ -10,5 +10,7 @@ export async function build(prDirectory: string, baseDirectory: string) {
   const baseOutput = await execAsync(
     `cd ${baseDirectory} && yarn && NODE_ENV=production yarn build`,
   );
-  return { prOutput, baseOutput };
+  const prCommit = await execAsync(`cd ${prDirectory} && git rev-parse --short HEAD`);
+  const baseCommit = await execAsync(`cd ${baseDirectory} && git rev-parse --short HEAD`);
+  return { prOutput, baseOutput, prCommit, baseCommit };
 }

@@ -23,7 +23,7 @@ async function run() {
   const prDirectory = Core.getInput('pr_directory_name');
   const baseDirectory = Core.getInput('base_directory_name');
 
-  const { prOutput, baseOutput } = await build(prDirectory, baseDirectory);
+  const { prOutput, baseOutput, prCommit, baseCommit } = await build(prDirectory, baseDirectory);
   Core.endGroup();
 
   Core.startGroup('calculateSizes');
@@ -39,7 +39,10 @@ async function run() {
     previousResult: baseResult,
   });
 
-  const markdown = getComparisonMarkdown({ ...comparison, commitRange: '' });
+  const markdown = getComparisonMarkdown({
+    ...comparison,
+    commitRange: `${baseCommit}..${prCommit}`,
+  });
   Core.debug(markdown);
 
   const prNumber =
