@@ -42,7 +42,13 @@ async function run() {
   const markdown = getComparisonMarkdown({ ...comparison, commitRange: '' });
   Core.debug(markdown);
 
-  if (!GitHub.context.payload.pull_request) {
+  const prNumber =
+    GitHub.context.payload.pull_request?.number ??
+    (GitHub.context.payload.issue?.html_url?.includes('/pull/')
+      ? GitHub.context.issue.number
+      : undefined);
+
+  if (!prNumber) {
     return Core.setFailed('Not a PR!');
   }
   if (!process.env.GITHUB_TOKEN) {
@@ -52,7 +58,7 @@ async function run() {
   const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
   await Octokit.issues.createComment({
     ...GitHub.context.repo,
-    issue_number: GitHub.context.payload.pull_request.number,
+    issue_number: prNumber,
     body: markdown,
   });
 
