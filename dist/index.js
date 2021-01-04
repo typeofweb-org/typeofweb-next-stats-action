@@ -9354,9 +9354,9 @@ exports.prettyBytesInverse = prettyBytesInverse;
 function addPercent(change, goodEmoji = '', badEmoji = ':small_red_triangle:') {
     const formatted = (change * 100).toFixed(2);
     if (/^-|^0(?:\.0+)$/.test(formatted)) {
-        return `${formatted}% ${goodEmoji}`;
+        return `${formatted}%${goodEmoji ? ' ' + goodEmoji : ''}`;
     }
-    return `+${formatted}% ${badEmoji}`;
+    return `+${formatted}%${badEmoji ? ' ' + badEmoji : ''}`;
 }
 exports.addPercent = addPercent;
 function formatDiff(absoluteChange, relativeChange) {
