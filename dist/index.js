@@ -9019,7 +9019,7 @@ async function run() {
     }, null, 2));
     const prDirectory = Core.getInput('pr_directory_name');
     const baseDirectory = Core.getInput('base_directory_name');
-    const [prOutput, baseOutput] = await next_build_1.build(prDirectory, baseDirectory);
+    const { prOutput, baseOutput } = await next_build_1.build(prDirectory, baseDirectory);
     const [prResult, baseResult] = await Promise.all([
         next_size_generator_1.getNextPagesSize(prOutput),
         next_size_generator_1.getNextPagesSize(baseOutput),
@@ -9051,10 +9051,9 @@ const utils_1 = __webpack_require__(1314);
 async function build(prDirectory, baseDirectory) {
     await fs_extra_1.default.copyFile(`${prDirectory}/.env-sample`, `${prDirectory}/.env`);
     await fs_extra_1.default.copyFile(`${baseDirectory}/.env-sample`, `${baseDirectory}/.env`);
-    return Promise.all([
-        utils_1.execAsync(`cd ${prDirectory} && yarn && NODE_ENV=production yarn build`),
-        utils_1.execAsync(`cd ${baseDirectory} && yarn && NODE_ENV=production yarn build`),
-    ]);
+    const prOutput = await utils_1.execAsync(`cd ${prDirectory} && yarn && NODE_ENV=production yarn build`);
+    const baseOutput = await utils_1.execAsync(`cd ${baseDirectory} && yarn && NODE_ENV=production yarn build`);
+    return { prOutput, baseOutput };
 }
 exports.build = build;
 
