@@ -25,8 +25,8 @@ export function uniqKeys<R extends object, U extends object>(
   obj2: U,
 ): ReadonlyArray<keyof R | keyof U> {
   return uniq([
-    ...(Object.keys(obj1) as ReadonlyArray<keyof R>),
-    ...(Object.keys(obj2) as ReadonlyArray<keyof U>),
+    ...((Object.keys(obj1) as unknown) as ReadonlyArray<keyof R>),
+    ...((Object.keys(obj2) as unknown) as ReadonlyArray<keyof U>),
   ]);
 }
 

@@ -25,9 +25,12 @@
     "fs-extra": "9.0.1",
     "pretty-bytes": "5.5.0"
   },
+  "scripts": {
+    "build": "tsc"
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged && yarn build"
     }
   },
   "lint-staged": {
