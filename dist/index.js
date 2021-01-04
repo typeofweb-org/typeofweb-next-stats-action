@@ -9017,19 +9017,34 @@ async function run() {
         issue: GitHub.context.issue,
         repo: GitHub.context.repo,
     }, null, 2));
+    Core.startGroup('build');
     const prDirectory = Core.getInput('pr_directory_name');
     const baseDirectory = Core.getInput('base_directory_name');
     const { prOutput, baseOutput } = await next_build_1.build(prDirectory, baseDirectory);
+    Core.endGroup();
+    Core.startGroup('calculateSizes');
     const [prResult, baseResult] = await Promise.all([
         next_size_generator_1.getNextPagesSize(prOutput),
         next_size_generator_1.getNextPagesSize(baseOutput),
     ]);
+    Core.endGroup();
+    Core.startGroup('postComment');
     const comparison = next_size_comparison_1.generateComparison({
         currentResult: prResult,
         previousResult: baseResult,
     });
     const markdown = next_size_formatter_1.getComparisonMarkdown({ ...comparison, commitRange: '' });
     Core.debug(markdown);
+    if (!GitHub.context.payload.pull_request) {
+        return Core.setFailed('Not a PR!');
+    }
+    const Octokit = GitHub.getOctokit(Core.getInput('GITHUB_TOKEN'));
+    await Octokit.issues.createComment({
+        ...GitHub.context.repo,
+        issue_number: GitHub.context.payload.pull_request.number,
+        body: markdown,
+    });
+    Core.endGroup();
 }
 run().catch((err) => Core.setFailed(err));
 
