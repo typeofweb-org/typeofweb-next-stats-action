@@ -23,7 +23,7 @@ async function run() {
   const prDirectory = Core.getInput('pr_directory_name');
   const baseDirectory = Core.getInput('base_directory_name');
 
-  const { prOutput, baseOutput } = await build(prDirectory, baseDirectory);
+  const { prOutput, baseOutput, prCommit, baseCommit } = await build(prDirectory, baseDirectory);
   Core.endGroup();
 
   Core.startGroup('calculateSizes');
@@ -39,10 +39,19 @@ async function run() {
     previousResult: baseResult,
   });
 
-  const markdown = getComparisonMarkdown({ ...comparison, commitRange: '' });
+  const markdown = getComparisonMarkdown({
+    ...comparison,
+    commitRange: `${baseCommit}..${prCommit}`,
+  });
   Core.debug(markdown);
 
-  if (!GitHub.context.payload.pull_request) {
+  const prNumber =
+    GitHub.context.payload.pull_request?.number ??
+    (GitHub.context.payload.issue?.html_url?.includes('/pull/')
+      ? GitHub.context.issue.number
+      : undefined);
+
+  if (!prNumber) {
     return Core.setFailed('Not a PR!');
   }
   if (!process.env.GITHUB_TOKEN) {
@@ -52,7 +61,7 @@ async function run() {
   const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
   await Octokit.issues.createComment({
     ...GitHub.context.repo,
-    issue_number: GitHub.context.payload.pull_request.number,
+    issue_number: prNumber,
     body: markdown,
   });
 

@@ -9012,6 +9012,7 @@ const next_size_comparison_1 = __webpack_require__(8681);
 const next_size_formatter_1 = __webpack_require__(7566);
 const next_size_generator_1 = __webpack_require__(7542);
 async function run() {
+    var _a, _b, _c, _d;
     Core.debug(JSON.stringify({
         ...GitHub.context,
         issue: GitHub.context.issue,
@@ -9020,7 +9021,7 @@ async function run() {
     Core.startGroup('build');
     const prDirectory = Core.getInput('pr_directory_name');
     const baseDirectory = Core.getInput('base_directory_name');
-    const { prOutput, baseOutput } = await next_build_1.build(prDirectory, baseDirectory);
+    const { prOutput, baseOutput, prCommit, baseCommit } = await next_build_1.build(prDirectory, baseDirectory);
     Core.endGroup();
     Core.startGroup('calculateSizes');
     const [prResult, baseResult] = await Promise.all([
@@ -9033,9 +9034,14 @@ async function run() {
         currentResult: prResult,
         previousResult: baseResult,
     });
-    const markdown = next_size_formatter_1.getComparisonMarkdown({ ...comparison, commitRange: '' });
+    const markdown = next_size_formatter_1.getComparisonMarkdown({
+        ...comparison,
+        commitRange: `${baseCommit}..${prCommit}`,
+    });
     Core.debug(markdown);
-    if (!GitHub.context.payload.pull_request) {
+    const prNumber = (_b = (_a = GitHub.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) !== null && _b !== void 0 ? _b : (((_d = (_c = GitHub.context.payload.issue) === null || _c === void 0 ? void 0 : _c.html_url) === null || _d === void 0 ? void 0 : _d.includes('/pull/')) ? GitHub.context.issue.number
+        : undefined);
+    if (!prNumber) {
         return Core.setFailed('Not a PR!');
     }
     if (!process.env.GITHUB_TOKEN) {
@@ -9044,7 +9050,7 @@ async function run() {
     const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
     await Octokit.issues.createComment({
         ...GitHub.context.repo,
-        issue_number: GitHub.context.payload.pull_request.number,
+        issue_number: prNumber,
         body: markdown,
     });
     Core.endGroup();
@@ -9071,7 +9077,9 @@ async function build(prDirectory, baseDirectory) {
     await fs_extra_1.default.copyFile(`${baseDirectory}/.env-sample`, `${baseDirectory}/.env`);
     const prOutput = await utils_1.execAsync(`cd ${prDirectory} && yarn && NODE_ENV=production yarn build`);
     const baseOutput = await utils_1.execAsync(`cd ${baseDirectory} && yarn && NODE_ENV=production yarn build`);
-    return { prOutput, baseOutput };
+    const prCommit = await utils_1.execAsync(`cd ${prDirectory} && git rev-parse --short HEAD`);
+    const baseCommit = await utils_1.execAsync(`cd ${baseDirectory} && git rev-parse --short HEAD`);
+    return { prOutput, baseOutput, prCommit, baseCommit };
 }
 exports.build = build;
 
