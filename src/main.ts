@@ -21,7 +21,7 @@ async function run() {
   const prDirectory = Core.getInput('pr_directory_name');
   const baseDirectory = Core.getInput('base_directory_name');
 
-  const [prOutput, baseOutput] = await build(prDirectory, baseDirectory);
+  const { prOutput, baseOutput } = await build(prDirectory, baseDirectory);
 
   const [prResult, baseResult] = await Promise.all([
     getNextPagesSize(prOutput),
