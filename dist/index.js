@@ -8985,24 +8985,40 @@ function wrappy (fn, cb) {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__webpack_require__(2186));
-const github_1 = __importDefault(__webpack_require__(5438));
+const Core = __importStar(__webpack_require__(2186));
+const GitHub = __importStar(__webpack_require__(5438));
 const next_build_1 = __webpack_require__(170);
 const next_size_comparison_1 = __webpack_require__(8681);
 const next_size_formatter_1 = __webpack_require__(7566);
 const next_size_generator_1 = __webpack_require__(7542);
 async function run() {
-    core_1.default.debug(JSON.stringify({
-        ...github_1.default.context,
-        issue: github_1.default.context.issue,
-        repo: github_1.default.context.repo,
+    Core.debug(JSON.stringify({
+        ...GitHub.context,
+        issue: GitHub.context.issue,
+        repo: GitHub.context.repo,
     }, null, 2));
-    const prDirectory = core_1.default.getInput('pr_directory_name');
-    const baseDirectory = core_1.default.getInput('base_directory_name');
+    const prDirectory = Core.getInput('pr_directory_name');
+    const baseDirectory = Core.getInput('base_directory_name');
     const [prOutput, baseOutput] = await next_build_1.build(prDirectory, baseDirectory);
     const [prResult, baseResult] = await Promise.all([
         next_size_generator_1.getNextPagesSize(prOutput),
@@ -9013,9 +9029,9 @@ async function run() {
         previousResult: baseResult,
     });
     const markdown = next_size_formatter_1.getComparisonMarkdown({ ...comparison, commitRange: '' });
-    core_1.default.debug(markdown);
+    Core.debug(markdown);
 }
-run().catch((err) => core_1.default.setFailed(err));
+run().catch((err) => Core.setFailed(err));
 
 
 /***/ }),

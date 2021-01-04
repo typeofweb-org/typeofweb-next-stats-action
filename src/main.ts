@@ -1,5 +1,5 @@
-import Core from '@actions/core';
-import GitHub from '@actions/github';
+import * as Core from '@actions/core';
+import * as GitHub from '@actions/github';
 
 import { build } from './next-build';
 import { generateComparison } from './next-size-comparison';
