@@ -39,6 +39,7 @@ jobs:
         run: yarn build
 
       - run: find ./ -name ".gitignore" -delete
+      - run: rm -rf node_modules
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
