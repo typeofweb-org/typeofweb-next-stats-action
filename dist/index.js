@@ -9038,7 +9038,10 @@ async function run() {
     if (!GitHub.context.payload.pull_request) {
         return Core.setFailed('Not a PR!');
     }
-    const Octokit = GitHub.getOctokit(Core.getInput('GITHUB_TOKEN'));
+    if (!process.env.GITHUB_TOKEN) {
+        return Core.setFailed('Missing GITHUB_TOKEN!');
+    }
+    const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
     await Octokit.issues.createComment({
         ...GitHub.context.repo,
         issue_number: GitHub.context.payload.pull_request.number,
