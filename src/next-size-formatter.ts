@@ -76,6 +76,7 @@ function createComparisonTable(
           ],
           ...Object.entries(children).map(([childName, { parsed }]) => {
             return [
+              '',
               `  └ ${childName}`,
               formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
               PrettyBytes(parsed.current),

@@ -61494,6 +61494,7 @@ function createComparisonTable(entries, { computeBundleLabel }) {
             ],
             ...Object.entries(children).map(([childName, { parsed }]) => {
                 return [
+                    '',
                     `  └ ${childName}`,
                     utils_1.formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
                     pretty_bytes_1.default(parsed.current),
