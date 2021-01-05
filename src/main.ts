@@ -3,7 +3,7 @@ import * as GitHub from '@actions/github';
 
 import { build } from './next-build';
 import { generateComparison } from './next-size-comparison';
-import { getComparisonMarkdown } from './next-size-formatter';
+import { getComparisonMarkdown, HEADER } from './next-size-formatter';
 import { getNextPagesSize } from './next-size-generator';
 
 async function run() {
@@ -41,7 +41,7 @@ async function run() {
 
   const markdown = getComparisonMarkdown({
     ...comparison,
-    commitRange: `${baseCommit}..${prCommit}`,
+    commitRange: `${baseCommit}...${prCommit}`,
   });
   Core.debug(markdown);
 
@@ -59,13 +59,37 @@ async function run() {
   }
 
   const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
-  await Octokit.issues.createComment({
-    ...GitHub.context.repo,
-    issue_number: prNumber,
-    body: markdown,
-  });
+
+  const existingComment = await findExistingComment(Octokit, GitHub.context, prNumber);
+  Core.debug(JSON.stringify({ existingComment }));
+
+  if (existingComment) {
+    await Octokit.issues.updateComment({
+      ...GitHub.context.repo,
+      comment_id: existingComment.id,
+      body: markdown,
+    });
+  } else {
+    await Octokit.issues.createComment({
+      ...GitHub.context.repo,
+      issue_number: prNumber,
+      body: markdown,
+    });
+  }
 
   Core.endGroup();
+}
+
+async function findExistingComment(
+  Octokit: ReturnType<typeof GitHub.getOctokit>,
+  Context: typeof GitHub.context,
+  prNumber: number,
+) {
+  const { data: comments } = await Octokit.issues.listComments({
+    ...Context.repo,
+    issue_number: prNumber,
+  });
+  return comments.find((comment) => comment.body?.includes(HEADER));
 }
 
 run().catch((err) => Core.setFailed(err));

@@ -3,6 +3,8 @@ import PrettyBytes from 'pretty-bytes';
 import type { ParsedSizeComparison, SizesComparisonEntry } from './types';
 import { formatDiff, generateMDTable } from './utils';
 
+export const HEADER = '<!-- typeofweb/typeofweb-next-stats-action header -->';
+
 export function getComparisonMarkdown({
   detailedComparison,
   summaryOfResults,
@@ -17,6 +19,7 @@ export function getComparisonMarkdown({
   });
 
   return `
+${HEADER}
 # Bundle size changes
 
 <p>Comparing: ${commitRange}</p>

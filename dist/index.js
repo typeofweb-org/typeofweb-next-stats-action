@@ -9036,7 +9036,7 @@ async function run() {
     });
     const markdown = next_size_formatter_1.getComparisonMarkdown({
         ...comparison,
-        commitRange: `${baseCommit}..${prCommit}`,
+        commitRange: `${baseCommit}...${prCommit}`,
     });
     Core.debug(markdown);
     const prNumber = (_b = (_a = GitHub.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) !== null && _b !== void 0 ? _b : (((_d = (_c = GitHub.context.payload.issue) === null || _c === void 0 ? void 0 : _c.html_url) === null || _d === void 0 ? void 0 : _d.includes('/pull/')) ? GitHub.context.issue.number
@@ -9048,12 +9048,30 @@ async function run() {
         return Core.setFailed('Missing GITHUB_TOKEN!');
     }
     const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
-    await Octokit.issues.createComment({
-        ...GitHub.context.repo,
-        issue_number: prNumber,
-        body: markdown,
-    });
+    const existingComment = await findExistingComment(Octokit, GitHub.context, prNumber);
+    Core.debug(JSON.stringify({ existingComment }));
+    if (existingComment) {
+        await Octokit.issues.updateComment({
+            ...GitHub.context.repo,
+            comment_id: existingComment.id,
+            body: markdown,
+        });
+    }
+    else {
+        await Octokit.issues.createComment({
+            ...GitHub.context.repo,
+            issue_number: prNumber,
+            body: markdown,
+        });
+    }
     Core.endGroup();
+}
+async function findExistingComment(Octokit, Context, prNumber) {
+    const { data: comments } = await Octokit.issues.listComments({
+        ...Context.repo,
+        issue_number: prNumber,
+    });
+    return comments.find((comment) => { var _a; return (_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes(next_size_formatter_1.HEADER); });
 }
 run().catch((err) => Core.setFailed(err));
 
@@ -9157,14 +9175,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getComparisonMarkdown = void 0;
+exports.getComparisonMarkdown = exports.HEADER = void 0;
 const pretty_bytes_1 = __importDefault(__webpack_require__(5168));
 const utils_1 = __webpack_require__(1314);
+exports.HEADER = '<!-- typeofweb/typeofweb-next-stats-action header -->';
 function getComparisonMarkdown({ detailedComparison, summaryOfResults, commitRange, }) {
     const pageDetailsTable = createComparisonTable(detailedComparison, {
         computeBundleLabel: (bundleId) => bundleId,
     });
     return `
+${exports.HEADER}
 # Bundle size changes
 
 <p>Comparing: ${commitRange}</p>
