@@ -3,8 +3,9 @@ import * as GitHub from '@actions/github';
 
 import { build } from './next-build';
 import { generateComparison } from './next-size-comparison';
-import { getComparisonMarkdown, HEADER } from './next-size-formatter';
+import { getComparisonMarkdown } from './next-size-formatter';
 import { getNextPagesSize } from './next-size-generator';
+import { findExistingComment, getOctokit, saveCache } from './octokit';
 
 async function run() {
   Core.debug(
@@ -24,6 +25,15 @@ async function run() {
   const baseDirectory = Core.getInput('base_directory_name');
 
   const { prOutput, baseOutput, prCommit, baseCommit } = await build(prDirectory, baseDirectory);
+
+  await saveCache({
+    content: prOutput,
+    key: prCommit,
+  });
+  await saveCache({
+    content: baseOutput,
+    key: baseCommit,
+  });
   Core.endGroup();
 
   Core.startGroup('calculateSizes');
@@ -54,11 +64,12 @@ async function run() {
   if (!prNumber) {
     return Core.setFailed('Not a PR!');
   }
-  if (!process.env.GITHUB_TOKEN) {
+
+  const Octokit = getOctokit();
+
+  if (!Octokit) {
     return Core.setFailed('Missing GITHUB_TOKEN!');
   }
-
-  const Octokit = GitHub.getOctokit(process.env.GITHUB_TOKEN);
 
   const existingComment = await findExistingComment(Octokit, GitHub.context, prNumber);
   Core.debug(JSON.stringify({ existingComment }));
@@ -78,18 +89,6 @@ async function run() {
   }
 
   Core.endGroup();
-}
-
-async function findExistingComment(
-  Octokit: ReturnType<typeof GitHub.getOctokit>,
-  Context: typeof GitHub.context,
-  prNumber: number,
-) {
-  const { data: comments } = await Octokit.issues.listComments({
-    ...Context.repo,
-    issue_number: prNumber,
-  });
-  return comments.find((comment) => comment.body?.includes(HEADER));
 }
 
 run().catch((err) => Core.setFailed(err));
