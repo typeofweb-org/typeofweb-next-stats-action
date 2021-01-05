@@ -61804,7 +61804,8 @@ function formatDiff(absoluteChange, relativeChange) {
 }
 exports.formatDiff = formatDiff;
 function generateMDTable(headers, body) {
-    const headerRow = headers.map((header) => header.label);
+    const ZERO_WIDTH_SPACE = '&#xfeff;';
+    const headerRow = headers.map((header) => header.label || ZERO_WIDTH_SPACE);
     const alignmentRow = headers.map((header) => {
         if (header.align === 'right') {
             return ' ---:';
@@ -61814,7 +61815,8 @@ function generateMDTable(headers, body) {
         }
         return ' --- ';
     });
-    return [headerRow, alignmentRow, ...body].map((row) => row.join(' | ')).join('\n');
+    const bodyRows = body.map((row) => row.map((val) => val || ZERO_WIDTH_SPACE));
+    return [headerRow, alignmentRow, ...bodyRows].map((row) => row.join(' | ')).join('\n');
 }
 exports.generateMDTable = generateMDTable;
 

@@ -70,7 +70,8 @@ export function generateMDTable(
   headers: ReadonlyArray<{ readonly label: string; readonly align: 'left' | 'center' | 'right' }>,
   body: readonly (readonly string[])[],
 ): string {
-  const headerRow = headers.map((header) => header.label);
+  const ZERO_WIDTH_SPACE = '&#xfeff;';
+  const headerRow = headers.map((header) => header.label || ZERO_WIDTH_SPACE);
   const alignmentRow = headers.map((header) => {
     if (header.align === 'right') {
       return ' ---:';
@@ -81,5 +82,7 @@ export function generateMDTable(
     return ' --- ';
   });
 
-  return [headerRow, alignmentRow, ...body].map((row) => row.join(' | ')).join('\n');
+  const bodyRows = body.map((row) => row.map((val) => val || ZERO_WIDTH_SPACE));
+
+  return [headerRow, alignmentRow, ...bodyRows].map((row) => row.join(' | ')).join('\n');
 }
