@@ -24,5 +24,6 @@ export async function build(prDirectory: string, baseDirectory: string) {
 async function buildNext(path: string) {
   Core.debug(`Building Next.js for ${path}`);
   await Fse.copyFile(`${path}/.env-sample`, `${path}/.env`);
-  return execAsync(`cd ${path} && yarn && NODE_ENV=production yarn build`);
+  await execAsync(`cd ${path} && yarn`);
+  return execAsync(`cd ${path} && NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production yarn build`);
 }
