@@ -32,6 +32,10 @@ export function getNextPagesSize(consoleOutput: string) {
         // skip because it's included later on as /static/pages/_app so this is a duplicate
         return acc;
       }
+      if (group.pageUrl.startsWith('/api')) {
+        // skip API routes
+        return acc;
+      }
       if (group.subTree && index > 0) {
         // eslint-disable-next-line functional/no-loop-statement
         for (let i = acc.length - 1; i >= 0; --i) {
