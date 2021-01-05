@@ -28,11 +28,11 @@ async function run() {
 
   await saveCache({
     content: prOutput,
-    key: prCommit,
+    commit: prCommit,
   });
   await saveCache({
     content: baseOutput,
-    key: baseCommit,
+    commit: baseCommit,
   });
   Core.endGroup();
 

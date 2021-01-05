@@ -61199,11 +61199,11 @@ async function run() {
     const { prOutput, baseOutput, prCommit, baseCommit } = await next_build_1.build(prDirectory, baseDirectory);
     await octokit_1.saveCache({
         content: prOutput,
-        key: prCommit,
+        commit: prCommit,
     });
     await octokit_1.saveCache({
         content: baseOutput,
-        key: baseCommit,
+        commit: baseCommit,
     });
     Core.endGroup();
     Core.startGroup('calculateSizes');
@@ -61291,11 +61291,11 @@ async function build(prDirectory, baseDirectory) {
     var _a, _b;
     const prCommit = await utils_1.execAsync(`cd ${prDirectory} && git rev-parse HEAD`);
     const baseCommit = await utils_1.execAsync(`cd ${baseDirectory} && git rev-parse HEAD`);
-    const prOutput = (_a = (await octokit_1.readCache({ key: prCommit }))) !== null && _a !== void 0 ? _a : (await buildNext(prDirectory));
+    const prOutput = (_a = (await octokit_1.readCache({ commit: prCommit }))) !== null && _a !== void 0 ? _a : (await buildNext(prDirectory));
     Core.startGroup('prOutput');
     Core.debug(prOutput);
     Core.endGroup();
-    const baseOutput = (_b = (await octokit_1.readCache({ key: baseCommit }))) !== null && _b !== void 0 ? _b : (await buildNext(baseDirectory));
+    const baseOutput = (_b = (await octokit_1.readCache({ commit: baseCommit }))) !== null && _b !== void 0 ? _b : (await buildNext(baseDirectory));
     Core.startGroup('prOutput');
     Core.debug(baseOutput);
     Core.endGroup();
@@ -61592,6 +61592,7 @@ const Core = __importStar(__webpack_require__(2186));
 const GitHub = __importStar(__webpack_require__(5438));
 const fs_extra_1 = __importDefault(__webpack_require__(5630));
 const next_size_formatter_1 = __webpack_require__(7566);
+const CACHE_KEY_PREFIX = 'typeofweb_next_stats_action-';
 function getOctokit() {
     if (!process.env.GITHUB_TOKEN) {
         return null;
@@ -61607,7 +61608,8 @@ async function findExistingComment(Octokit, Context, prNumber) {
     return comments.find((comment) => { var _a; return (_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes(next_size_formatter_1.HEADER); });
 }
 exports.findExistingComment = findExistingComment;
-async function saveCache({ content, key, }) {
+async function saveCache({ content, commit, }) {
+    const key = CACHE_KEY_PREFIX + commit;
     await fs_extra_1.default.outputFile(key, content, { encoding: 'utf8' });
     try {
         await Cache.saveCache([key], key, { uploadConcurrency: 1 });
@@ -61626,7 +61628,8 @@ async function saveCache({ content, key, }) {
     Core.debug(`Saved cache key: ${key}`);
 }
 exports.saveCache = saveCache;
-async function readCache({ key }) {
+async function readCache({ commit }) {
+    const key = CACHE_KEY_PREFIX + commit;
     const foundKey = await Cache.restoreCache([key], key);
     if (!foundKey) {
         return undefined;
