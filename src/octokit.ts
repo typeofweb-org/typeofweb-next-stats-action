@@ -5,6 +5,8 @@ import Fse from 'fs-extra';
 
 import { HEADER } from './next-size-formatter';
 
+const CACHE_KEY_PREFIX = 'typeofweb_next_stats_action-';
+
 export function getOctokit() {
   if (!process.env.GITHUB_TOKEN) {
     return null;
@@ -27,11 +29,13 @@ export async function findExistingComment(
 
 export async function saveCache({
   content,
-  key,
+  commit,
 }: {
   readonly content: string;
-  readonly key: string;
+  readonly commit: string;
 }) {
+  const key = CACHE_KEY_PREFIX + commit;
+
   await Fse.outputFile(key, content, { encoding: 'utf8' });
   try {
     await Cache.saveCache([key], key, { uploadConcurrency: 1 });
@@ -48,7 +52,9 @@ export async function saveCache({
   Core.debug(`Saved cache key: ${key}`);
 }
 
-export async function readCache({ key }: { readonly key: string }) {
+export async function readCache({ commit }: { readonly commit: string }) {
+  const key = CACHE_KEY_PREFIX + commit;
+
   const foundKey = await Cache.restoreCache([key], key);
   if (!foundKey) {
     return undefined;

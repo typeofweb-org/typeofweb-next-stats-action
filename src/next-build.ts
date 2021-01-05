@@ -8,12 +8,12 @@ export async function build(prDirectory: string, baseDirectory: string) {
   const prCommit = await execAsync(`cd ${prDirectory} && git rev-parse HEAD`);
   const baseCommit = await execAsync(`cd ${baseDirectory} && git rev-parse HEAD`);
 
-  const prOutput = (await readCache({ key: prCommit })) ?? (await buildNext(prDirectory));
+  const prOutput = (await readCache({ commit: prCommit })) ?? (await buildNext(prDirectory));
   Core.startGroup('prOutput');
   Core.debug(prOutput);
   Core.endGroup();
 
-  const baseOutput = (await readCache({ key: baseCommit })) ?? (await buildNext(baseDirectory));
+  const baseOutput = (await readCache({ commit: baseCommit })) ?? (await buildNext(baseDirectory));
   Core.startGroup('prOutput');
   Core.debug(baseOutput);
   Core.endGroup();
