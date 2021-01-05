@@ -61259,11 +61259,31 @@ run().catch((err) => Core.setFailed(err));
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.build = void 0;
+const Core = __importStar(__webpack_require__(2186));
 const fs_extra_1 = __importDefault(__webpack_require__(5630));
 const octokit_1 = __webpack_require__(6161);
 const utils_1 = __webpack_require__(1314);
@@ -61272,11 +61292,18 @@ async function build(prDirectory, baseDirectory) {
     const prCommit = await utils_1.execAsync(`cd ${prDirectory} && git rev-parse HEAD`);
     const baseCommit = await utils_1.execAsync(`cd ${baseDirectory} && git rev-parse HEAD`);
     const prOutput = (_a = (await octokit_1.readCache({ key: prCommit }))) !== null && _a !== void 0 ? _a : (await buildNext(prDirectory));
+    Core.startGroup('prOutput');
+    Core.debug(prOutput);
+    Core.endGroup();
     const baseOutput = (_b = (await octokit_1.readCache({ key: baseCommit }))) !== null && _b !== void 0 ? _b : (await buildNext(baseDirectory));
+    Core.startGroup('prOutput');
+    Core.debug(baseOutput);
+    Core.endGroup();
     return { prOutput, baseOutput, prCommit, baseCommit };
 }
 exports.build = build;
 async function buildNext(path) {
+    Core.debug(`Building Next.js for ${path}`);
     await fs_extra_1.default.copyFile(`${path}/.env-sample`, `${path}/.env`);
     return utils_1.execAsync(`cd ${path} && yarn && NODE_ENV=production yarn build`);
 }
