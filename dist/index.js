@@ -61305,7 +61305,8 @@ exports.build = build;
 async function buildNext(path) {
     Core.debug(`Building Next.js for ${path}`);
     await fs_extra_1.default.copyFile(`${path}/.env-sample`, `${path}/.env`);
-    return utils_1.execAsync(`cd ${path} && yarn && NODE_ENV=production yarn build`);
+    await utils_1.execAsync(`cd ${path} && yarn`);
+    return utils_1.execAsync(`cd ${path} && NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production yarn build`);
 }
 
 
