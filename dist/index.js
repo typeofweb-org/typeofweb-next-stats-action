@@ -41415,7 +41415,7 @@ exports.Octokit = Octokit;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 
-var isPlainObject = __webpack_require__(3287);
+var isPlainObject = __webpack_require__(558);
 var universalUserAgent = __webpack_require__(5030);
 
 function lowercaseKeys(object) {
@@ -41801,6 +41801,52 @@ const endpoint = withDefaults(null, DEFAULTS);
 
 exports.endpoint = endpoint;
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 558:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === '[object Object]';
+}
+
+function isPlainObject(o) {
+  var ctor,prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+exports.isPlainObject = isPlainObject;
 
 
 /***/ }),
@@ -43277,7 +43323,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var endpoint = __webpack_require__(9440);
 var universalUserAgent = __webpack_require__(5030);
-var isPlainObject = __webpack_require__(3287);
+var isPlainObject = __webpack_require__(9062);
 var nodeFetch = _interopDefault(__webpack_require__(467));
 var requestError = __webpack_require__(537);
 
@@ -43417,6 +43463,52 @@ const request = withDefaults(endpoint.endpoint, {
 
 exports.request = request;
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 9062:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === '[object Object]';
+}
+
+function isPlainObject(o) {
+  var ctor,prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+exports.isPlainObject = isPlainObject;
 
 
 /***/ }),
@@ -50299,52 +50391,6 @@ function patch (fs) {
     return false
   }
 }
-
-
-/***/ }),
-
-/***/ 3287:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-function isObject(o) {
-  return Object.prototype.toString.call(o) === '[object Object]';
-}
-
-function isPlainObject(o) {
-  var ctor,prot;
-
-  if (isObject(o) === false) return false;
-
-  // If has modified constructor
-  ctor = o.constructor;
-  if (ctor === undefined) return true;
-
-  // If has modified prototype
-  prot = ctor.prototype;
-  if (isObject(prot) === false) return false;
-
-  // If constructor does not have an Object-specific method
-  if (prot.hasOwnProperty('isPrototypeOf') === false) {
-    return false;
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-exports.isPlainObject = isPlainObject;
 
 
 /***/ }),
@@ -61317,12 +61363,9 @@ async function buildNext(path) {
 
 "use strict";
 
-// import path from "path";
-// import fse from "fs-extra";
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateComparison = void 0;
 const utils_1 = __webpack_require__(1314);
-// const snapshotDestPath = path.join(__dirname, "size-snapshot.json");
 function generateParsedSizesComparison(previous, current) {
     return {
         previous,
@@ -61358,6 +61401,7 @@ function generateComparison({ previousResult, currentResult, }) {
             {
                 parsed: generateParsedSizesComparison(previous.parsed, current.parsed),
                 children,
+                renderTypeChange: getRenderTypeChange(current.renderType, previous.renderType),
             },
         ];
     });
@@ -61370,6 +61414,15 @@ function generateComparison({ previousResult, currentResult, }) {
     return { detailedComparison, summaryOfResults };
 }
 exports.generateComparison = generateComparison;
+function getRenderTypeChange(current, previous) {
+    if (typeof current === 'undefined' || typeof previous === 'undefined') {
+        return '';
+    }
+    if (current === previous) {
+        return current;
+    }
+    return `${previous} ⮕ ${current}`;
+}
 
 
 /***/ }),
@@ -61385,12 +61438,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getComparisonMarkdown = exports.HEADER = void 0;
 const pretty_bytes_1 = __importDefault(__webpack_require__(5168));
+const types_1 = __webpack_require__(5077);
 const utils_1 = __webpack_require__(1314);
 exports.HEADER = '<!-- typeofweb/typeofweb-next-stats-action header -->';
 function getComparisonMarkdown({ detailedComparison, summaryOfResults, commitRange, }) {
     const pageDetailsTable = createComparisonTable(detailedComparison, {
         computeBundleLabel: (bundleId) => bundleId,
     });
+    const legend = Object.entries(types_1.renderTypeToName)
+        .map(([icon, { label, description }]) => `* ${icon} ⟶ (${label}) ${description}`)
+        .join('\n');
     return `
 ${exports.HEADER}
 # Bundle size changes
@@ -61405,12 +61462,15 @@ ${exports.HEADER}
 <summary>Details of page changes</summary>
 
 ${pageDetailsTable}
+
+${legend}
 </details>
 `.trim();
 }
 exports.getComparisonMarkdown = getComparisonMarkdown;
 function createComparisonTable(entries, { computeBundleLabel }) {
     return utils_1.generateMDTable([
+        { label: '', align: 'center' },
         { label: 'File', align: 'left' },
         { label: 'Size Change', align: 'right' },
         { label: 'Size', align: 'right' },
@@ -61424,9 +61484,10 @@ function createComparisonTable(entries, { computeBundleLabel }) {
         }
         return compareParsedDiff;
     })
-        .flatMap(([label, { parsed, children }]) => {
+        .flatMap(([label, { parsed, children, renderTypeChange }]) => {
         const result = [
             [
+                renderTypeChange,
                 label,
                 utils_1.formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
                 pretty_bytes_1.default(parsed.current),
@@ -61454,7 +61515,7 @@ function createComparisonTable(entries, { computeBundleLabel }) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getNextPagesSize = void 0;
 const utils_1 = __webpack_require__(1314);
-const pageRegex = /(?<treeViewPresentation>┌|├|└)\s+((?<subTree>┌|├|└)\s+)?((?<fileType>λ|○|●)\s+)?(?<pageUrl>[^\s]+)\s+(?<sizeFormatted>[0-9.]+)\s+(?<sizeUnit>\w+)/gm;
+const pageRegex = /(?<treeViewPresentation>┌|├|└)\s+((?<subTree>┌|├|└)\s+)?((?<renderType>λ|○|●)\s+)?(?<pageUrl>[^\s]+)\s+(?<sizeFormatted>[0-9.]+)\s+(?<sizeUnit>\w+)/gm;
 function getNextPagesSize(consoleOutput) {
     // eslint-disable-next-line functional/prefer-readonly-type
     const jsChunks = [];
@@ -61487,7 +61548,7 @@ function getNextPagesSize(consoleOutput) {
         return acc;
     }, []);
     const entries = groupedRows.map((row) => {
-        const { pageUrl, sizeFormatted, sizeUnit, children } = row;
+        const { pageUrl, sizeFormatted, sizeUnit, children, renderType = '' } = row;
         let snapshotId = `${pageUrl}`;
         if (pageUrl.startsWith('css/')) {
             cssChunks.push(utils_1.prettyBytesInverse(sizeFormatted, sizeUnit));
@@ -61508,8 +61569,9 @@ function getNextPagesSize(consoleOutput) {
         else if (/^chunks\/MarkdownText\.(.+)\.js$/.test(pageUrl)) {
             snapshotId = 'shared:MarkdownText';
         }
-        else if (/^chunks\/framework\.(.+)\.js$/.test(pageUrl)) {
-            snapshotId = 'shared:chunk/framework';
+        else if (/^chunks\/([a-z]+)\.(.+)\.js$/.test(pageUrl)) {
+            const [, name] = /^chunks\/([a-z]+)\.(.+)\.js$/.exec(pageUrl);
+            snapshotId = `shared:chunk/${name}`;
         }
         else if (/^chunks\/(.*)\.js$/.test(pageUrl)) {
             // shared chunks are unnamed and only have a hash
@@ -61526,6 +61588,7 @@ function getNextPagesSize(consoleOutput) {
             {
                 parsed: utils_1.prettyBytesInverse(sizeFormatted, sizeUnit),
                 childrenSize: childrenSizeSum,
+                renderType,
                 children: children.reduce((acc, c) => {
                     const key = c.pageUrl.replace(/\/[a-z0-9]{20}/, '/[hash]');
                     acc[key] = acc[key] || { parsed: 0 };
@@ -61642,6 +61705,35 @@ async function readCache({ commit }) {
     return fs_extra_1.default.readFile(foundKey, 'utf8');
 }
 exports.readCache = readCache;
+
+
+/***/ }),
+
+/***/ 5077:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.renderTypeToName = void 0;
+exports.renderTypeToName = {
+    λ: {
+        label: 'Server',
+        description: 'server-side renders at runtime (uses <code>getInitialProps</code> or <code>getServerSideProps</code>)',
+    },
+    '○': {
+        label: 'Static',
+        description: 'automatically rendered as static HTML (uses no initial props)',
+    },
+    '●': {
+        label: 'SSG',
+        description: 'automatically generated as static HTML + JSON (uses <code>getStaticProps</code>)',
+    },
+    '': {
+        label: 'ISR',
+        description: 'incremental static regeneration (uses revalidate in <code>getStaticProps</code>)',
+    },
+};
 
 
 /***/ }),
