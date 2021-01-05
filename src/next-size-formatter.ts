@@ -2,7 +2,7 @@ import PrettyBytes from 'pretty-bytes';
 
 import type { ParsedSizeComparison, SizesComparisonEntry } from './types';
 import { renderTypeToName } from './types';
-import { formatDiff, generateMDTable } from './utils';
+import { formatDiff, generateMDTable, ZERO_WIDTH_SPACE } from './utils';
 
 export const HEADER = '<!-- typeofweb/typeofweb-next-stats-action header -->';
 
@@ -76,7 +76,7 @@ function createComparisonTable(
           ],
           ...Object.entries(children).map(([childName, { parsed }]) => {
             return [
-              '',
+              ZERO_WIDTH_SPACE,
               `  └ ${childName}`,
               formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
               PrettyBytes(parsed.current),
