@@ -61494,7 +61494,7 @@ function createComparisonTable(entries, { computeBundleLabel }) {
             ],
             ...Object.entries(children).map(([childName, { parsed }]) => {
                 return [
-                    '',
+                    utils_1.ZERO_WIDTH_SPACE,
                     `  └ ${childName}`,
                     utils_1.formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
                     pretty_bytes_1.default(parsed.current),
@@ -61748,9 +61748,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateMDTable = exports.formatDiff = exports.addPercent = exports.prettyBytesInverse = exports.uniqKeys = exports.uniq = exports.execAsync = void 0;
+exports.generateMDTable = exports.formatDiff = exports.addPercent = exports.prettyBytesInverse = exports.uniqKeys = exports.uniq = exports.execAsync = exports.ZERO_WIDTH_SPACE = void 0;
 const child_process_1 = __webpack_require__(3129);
 const pretty_bytes_1 = __importDefault(__webpack_require__(5168));
+exports.ZERO_WIDTH_SPACE = '&#xfeff;';
 function execAsync(args) {
     return new Promise((resolve, reject) => {
         child_process_1.exec(args, (err, stdout) => {
@@ -61805,8 +61806,7 @@ function formatDiff(absoluteChange, relativeChange) {
 }
 exports.formatDiff = formatDiff;
 function generateMDTable(headers, body) {
-    const ZERO_WIDTH_SPACE = '&#xfeff;';
-    const headerRow = headers.map((header) => header.label || ZERO_WIDTH_SPACE);
+    const headerRow = headers.map((header) => header.label || exports.ZERO_WIDTH_SPACE);
     const alignmentRow = headers.map((header) => {
         if (header.align === 'right') {
             return ' ---:';
@@ -61816,7 +61816,7 @@ function generateMDTable(headers, body) {
         }
         return ' --- ';
     });
-    const bodyRows = body.map((row) => row.map((val) => val || ZERO_WIDTH_SPACE));
+    const bodyRows = body.map((row) => row.map((val) => val || exports.ZERO_WIDTH_SPACE));
     return [headerRow, alignmentRow, ...bodyRows].map((row) => row.join(' | ')).join('\n');
 }
 exports.generateMDTable = generateMDTable;

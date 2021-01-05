@@ -4,6 +4,8 @@ import PrettyBytes from 'pretty-bytes';
 
 import type { SizeUnit } from './types';
 
+export const ZERO_WIDTH_SPACE = '&#xfeff;';
+
 export function execAsync(args: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(args, (err, stdout) => {
@@ -70,7 +72,6 @@ export function generateMDTable(
   headers: ReadonlyArray<{ readonly label: string; readonly align: 'left' | 'center' | 'right' }>,
   body: readonly (readonly string[])[],
 ): string {
-  const ZERO_WIDTH_SPACE = '&#xfeff;';
   const headerRow = headers.map((header) => header.label || ZERO_WIDTH_SPACE);
   const alignmentRow = headers.map((header) => {
     if (header.align === 'right') {
