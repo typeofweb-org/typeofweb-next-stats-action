@@ -1,10 +1,10 @@
-import type { SizeUnit, SnapshotSizeEntry } from './types';
+import type { RenderType, SizeUnit, SnapshotSizeEntry } from './types';
 import { prettyBytesInverse } from './utils';
 
 type Group = {
   readonly treeViewPresentation: string;
   readonly subTree?: string;
-  readonly fileType?: string;
+  readonly renderType?: RenderType;
   readonly pageUrl: string;
   readonly sizeFormatted: string;
   readonly sizeUnit: SizeUnit;
@@ -12,7 +12,7 @@ type Group = {
   children: Group[];
 };
 
-const pageRegex = /(?<treeViewPresentation>┌|├|└)\s+((?<subTree>┌|├|└)\s+)?((?<fileType>λ|○|●)\s+)?(?<pageUrl>[^\s]+)\s+(?<sizeFormatted>[0-9.]+)\s+(?<sizeUnit>\w+)/gm;
+const pageRegex = /(?<treeViewPresentation>┌|├|└)\s+((?<subTree>┌|├|└)\s+)?((?<renderType>λ|○|●)\s+)?(?<pageUrl>[^\s]+)\s+(?<sizeFormatted>[0-9.]+)\s+(?<sizeUnit>\w+)/gm;
 
 export function getNextPagesSize(consoleOutput: string) {
   // eslint-disable-next-line functional/prefer-readonly-type
@@ -51,7 +51,7 @@ export function getNextPagesSize(consoleOutput: string) {
     }, []);
 
   const entries = groupedRows.map((row) => {
-    const { pageUrl, sizeFormatted, sizeUnit, children } = row;
+    const { pageUrl, sizeFormatted, sizeUnit, children, renderType = '' } = row;
     let snapshotId = `${pageUrl}`;
 
     if (pageUrl.startsWith('css/')) {
@@ -67,8 +67,9 @@ export function getNextPagesSize(consoleOutput: string) {
       snapshotId = 'shared:chunk/commons';
     } else if (/^chunks\/MarkdownText\.(.+)\.js$/.test(pageUrl)) {
       snapshotId = 'shared:MarkdownText';
-    } else if (/^chunks\/framework\.(.+)\.js$/.test(pageUrl)) {
-      snapshotId = 'shared:chunk/framework';
+    } else if (/^chunks\/([a-z]+)\.(.+)\.js$/.test(pageUrl)) {
+      const [, name] = /^chunks\/([a-z]+)\.(.+)\.js$/.exec(pageUrl)!;
+      snapshotId = `shared:chunk/${name!}`;
     } else if (/^chunks\/(.*)\.js$/.test(pageUrl)) {
       // shared chunks are unnamed and only have a hash
       // we just track their count and summed size
@@ -86,6 +87,7 @@ export function getNextPagesSize(consoleOutput: string) {
       {
         parsed: prettyBytesInverse(sizeFormatted, sizeUnit),
         childrenSize: childrenSizeSum,
+        renderType,
         children: children.reduce((acc, c) => {
           const key = c.pageUrl.replace(/\/[a-z0-9]{20}/, '/[hash]');
           acc[key] = acc[key] || { parsed: 0 };

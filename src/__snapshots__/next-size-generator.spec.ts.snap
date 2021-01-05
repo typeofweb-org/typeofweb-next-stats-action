@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getNextPagesSize should work 1`] = `
+Object {
+  "/404": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 3820,
+    "renderType": "○",
+  },
+  "/[displayStyle]": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 2530,
+    "renderType": "●",
+  },
+  "/[displayStyle]/[cursor]": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 2510,
+    "renderType": "●",
+  },
+  "/_err": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 1790,
+    "renderType": "λ",
+  },
+  "/admin": Object {
+    "children": Object {
+      "css/[hash].css": Object {
+        "parsed": 2610,
+      },
+    },
+    "childrenSize": 2610,
+    "parsed": 2810,
+    "renderType": "○",
+  },
+  "/artykuly/[slug]": Object {
+    "children": Object {
+      "css/[hash].css": Object {
+        "parsed": 3050,
+      },
+    },
+    "childrenSize": 3050,
+    "parsed": 1150,
+    "renderType": "●",
+  },
+  "/o-serwisie": Object {
+    "children": Object {
+      "css/[hash].css": Object {
+        "parsed": 2960,
+      },
+    },
+    "childrenSize": 2960,
+    "parsed": 2260,
+    "renderType": "○",
+  },
+  "/zglos-serwis": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 4660,
+    "renderType": "○",
+  },
+  "shared:_app.js": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 231,
+    "renderType": "",
+  },
+  "shared:chunk/framework": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 42000,
+    "renderType": "",
+  },
+  "shared:chunk/main": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 6300,
+    "renderType": "",
+  },
+  "shared:chunk/webpack": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "parsed": 1560,
+    "renderType": "",
+  },
+  "shared:css": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "count": 2,
+    "parsed": 5180,
+  },
+  "shared:js": Object {
+    "children": Object {},
+    "childrenSize": 0,
+    "count": 4,
+    "parsed": 55100,
+  },
+}
+`;

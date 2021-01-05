@@ -1,10 +1,5 @@
-// import path from "path";
-// import fse from "fs-extra";
-
-import type { ParsedSizeComparison, SnapshotSize } from './types';
+import type { ParsedSizeComparison, RenderType, SnapshotSize } from './types';
 import { uniqKeys } from './utils';
-
-// const snapshotDestPath = path.join(__dirname, "size-snapshot.json");
 
 function generateParsedSizesComparison(previous: number, current: number): ParsedSizeComparison {
   return {
@@ -54,6 +49,7 @@ export function generateComparison({
       {
         parsed: generateParsedSizesComparison(previous.parsed, current.parsed),
         children,
+        renderTypeChange: getRenderTypeChange(current.renderType, previous.renderType),
       },
     ] as const;
   });
@@ -70,4 +66,19 @@ export function generateComparison({
   const summaryOfResults = generateParsedSizesComparison(summary.previous, summary.current);
 
   return { detailedComparison, summaryOfResults };
+}
+
+function getRenderTypeChange(
+  current: RenderType | undefined,
+  previous: RenderType | undefined,
+): string {
+  if (typeof current === 'undefined' || typeof previous === 'undefined') {
+    return '';
+  }
+
+  if (current === previous) {
+    return current;
+  }
+
+  return `${previous} ⮕ ${current}`;
 }

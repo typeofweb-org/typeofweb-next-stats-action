@@ -1,6 +1,7 @@
 import PrettyBytes from 'pretty-bytes';
 
 import type { ParsedSizeComparison, SizesComparisonEntry } from './types';
+import { renderTypeToName } from './types';
 import { formatDiff, generateMDTable } from './utils';
 
 export const HEADER = '<!-- typeofweb/typeofweb-next-stats-action header -->';
@@ -18,6 +19,10 @@ export function getComparisonMarkdown({
     computeBundleLabel: (bundleId) => bundleId,
   });
 
+  const legend = Object.entries(renderTypeToName)
+    .map(([icon, { label, description }]) => `* ${icon} ⟶ (${label}) ${description}`)
+    .join('\n');
+
   return `
 ${HEADER}
 # Bundle size changes
@@ -32,6 +37,8 @@ ${HEADER}
 <summary>Details of page changes</summary>
 
 ${pageDetailsTable}
+
+${legend}
 </details>
 `.trim();
 }
@@ -42,6 +49,7 @@ function createComparisonTable(
 ) {
   return generateMDTable(
     [
+      { label: '', align: 'center' },
       { label: 'File', align: 'left' },
       { label: 'Size Change', align: 'right' },
       { label: 'Size', align: 'right' },
@@ -58,9 +66,10 @@ function createComparisonTable(
         }
         return compareParsedDiff;
       })
-      .flatMap(([label, { parsed, children }]) => {
+      .flatMap(([label, { parsed, children, renderTypeChange }]) => {
         const result = [
           [
+            renderTypeChange,
             label,
             formatDiff(parsed.absoluteDiff, parsed.relativeDiff),
             PrettyBytes(parsed.current),
