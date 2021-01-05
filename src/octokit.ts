@@ -33,7 +33,17 @@ export async function saveCache({
   readonly key: string;
 }) {
   await Fse.outputFile(key, content, { encoding: 'utf8' });
-  await Cache.saveCache([key], key);
+  try {
+    await Cache.saveCache([key], key, { uploadConcurrency: 1 });
+  } catch (err) {
+    const error = err as Error | undefined;
+    if (error?.name === Cache.ValidationError.name) {
+      throw error;
+    } else if (error?.name === Cache.ReserveCacheError.name) {
+      Core.info(error?.message);
+    }
+    Core.warning(error?.message!);
+  }
   await Fse.remove(key);
   Core.debug(`Saved cache key: ${key}`);
 }
