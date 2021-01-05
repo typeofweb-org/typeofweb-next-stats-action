@@ -61608,7 +61608,19 @@ async function findExistingComment(Octokit, Context, prNumber) {
 exports.findExistingComment = findExistingComment;
 async function saveCache({ content, key, }) {
     await fs_extra_1.default.outputFile(key, content, { encoding: 'utf8' });
-    await Cache.saveCache([key], key);
+    try {
+        await Cache.saveCache([key], key, { uploadConcurrency: 1 });
+    }
+    catch (err) {
+        const error = err;
+        if ((error === null || error === void 0 ? void 0 : error.name) === Cache.ValidationError.name) {
+            throw error;
+        }
+        else if ((error === null || error === void 0 ? void 0 : error.name) === Cache.ReserveCacheError.name) {
+            Core.info(error === null || error === void 0 ? void 0 : error.message);
+        }
+        Core.warning(error === null || error === void 0 ? void 0 : error.message);
+    }
     await fs_extra_1.default.remove(key);
     Core.debug(`Saved cache key: ${key}`);
 }
