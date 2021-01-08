@@ -61335,8 +61335,8 @@ const octokit_1 = __webpack_require__(6161);
 const utils_1 = __webpack_require__(1314);
 async function build(prDirectory, baseDirectory) {
     var _a, _b;
-    const prCommit = await utils_1.execAsync(`cd ${prDirectory} && git rev-parse HEAD`);
-    const baseCommit = await utils_1.execAsync(`cd ${baseDirectory} && git rev-parse HEAD`);
+    const prCommit = await utils_1.execAsync(`cd ${prDirectory} && git rev-parse HEAD:`);
+    const baseCommit = await utils_1.execAsync(`cd ${baseDirectory} && git rev-parse HEAD:`);
     const prOutput = (_a = (await octokit_1.readCache({ commit: prCommit }))) !== null && _a !== void 0 ? _a : (await buildNext(prDirectory));
     Core.startGroup('prOutput');
     Core.debug(prOutput);
