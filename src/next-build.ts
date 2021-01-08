@@ -5,8 +5,8 @@ import { readCache } from './octokit';
 import { execAsync } from './utils';
 
 export async function build(prDirectory: string, baseDirectory: string) {
-  const prCommit = await execAsync(`cd ${prDirectory} && git rev-parse HEAD`);
-  const baseCommit = await execAsync(`cd ${baseDirectory} && git rev-parse HEAD`);
+  const prCommit = await execAsync(`cd ${prDirectory} && git rev-parse HEAD:`);
+  const baseCommit = await execAsync(`cd ${baseDirectory} && git rev-parse HEAD:`);
 
   const prOutput = (await readCache({ commit: prCommit })) ?? (await buildNext(prDirectory));
   Core.startGroup('prOutput');
